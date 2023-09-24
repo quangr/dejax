@@ -7,7 +7,12 @@ def tile_over_axis(tensor, axis, size):
     tensor = jnp.expand_dims(tensor, axis)
     tensor = jnp.repeat(tensor, size, axis=axis)
     return tensor
-
+    
+def set_pytree_batch_items(tree_batch, index, trees):
+    return jax.tree_util.tree_map(
+        lambda tb, t: jax.lax.dynamic_update_slice(tb, t, (index,*tuple([jnp.int32(0)]*(len(t.shape)-1)))),
+        tree_batch, trees,
+    )
 
 def type_to_dtype(t):
     if t == int:
